@@ -1,19 +1,19 @@
 # DTS_datapro_import
 MATLAB import of DTS DataPro file format
 
-This file will import Diversified Technical Systems Inc. (DTS) DataPro hybrid XML-ish/binary file format into a nested set of MATLAB dictionaries and structure. It does not try and interpret the file in any way. That is, it simply reads what is there and does basic error checking against the limited set of constraints that exist in the file format's documentation. As of this writing, the file format is poorly documented which makes it difficult to impossible to link the metadata that exists in the top-level .dts XML file to the information contained in the nested .CHN files. In any case, if you simply care about the ADC count data with basic information about it sufficient for a header, the reader will provide that.
+This file will import Diversified Technical Systems Inc. (DTS) DataPro hybrid XML-ish/binary file format into a nested set of MATLAB dictionaries and structure. It does not try and interpret the file in any way. That is, it simply reads what is there and does basic error checking against the limited set of constraints that exist in the file format's documentation. As of this writing, the file format is poorly documented which makes it difficult to impossible to link the metadata that exists in the top-level .dts XML file to the information contained in the nested .CHN files. In any case, if you simply care about the ADC count data with basic information sufficient for a header, this reader will provide that.
 
-To call,  `importDTSFolder(folderpath)` where `folderpath` is the path to a folder containing exactly one .dts file and the corresponding .chn files.
+To use, call `importDTSFolder(folderpath)` where `folderpath` is the path to a folder containing exactly one .dts file and the corresponding .chn files.
 
-The return value is a structure with two fields `meta` and `contents`. The meta field is a vector of `meta` structures and the `contents` field is a containers.Map where the key is the name of a .chn file and the value is a structure of the .chn file contents. 
+The return value is a structure with two fields, `meta` and `contents`. The meta field is a vector of `meta` structures and the `contents` field is a containers.Map where the key is the name of a .chn file and the value is a `contents` structure of the .chn file. 
 
 The `meta` structure contains three fields: 
 
-1. `attributes` - a containers.Map where the key corresponds to the XML attribute name and the value is a string
-2. `value` - DTS files do not uniformly handle metadata, sometimes the value of a field appears as an XML attribute on a node, other times it is a value--that is between opening <...> and </...>. If the XML node contains a non-attribute value, then it appears on in this field. All leading and trailing whitespace is trimmed and if there are nested XML nodes in this value, then the code throws an error
+1. `attributes` - a containers.Map where the each key corresponds to the XML attribute name and its string value
+2. `value` - DTS files do not contain uniform metadata, sometimes the value of a field appears as an XML attribute on a node, other times it is a value--that is, between opening <...> and </...> tags. If the XML node contains a non-attribute value, then it appears in this field. All leading and trailing whitespace is trimmed. If there are child nodes in this field in the original XML file, then the code throws an error
 3. `children` - a containers.Map where the key corresponds to the name of the nested XML node and the value is another `meta` structure.
 
-The value of the `contents` containers.Map is a structure describing the version 4 of the .chn binary file. Currently it contains the following fields:
+The `contents` structure describes version 4 of the .chn binary file. Currently it contains the following fields:
 
 ```
   'versionNo',[], ...
@@ -47,7 +47,7 @@ The value of the `contents` containers.Map is a structure describing the version
 
 ##Limitations
 
-The published documentation on the .chn file format claims that it uses a CRC32 checksum on the header data only. After discussing with DTS, they state that they actually use a crc16_CCITT where the other 2 bytes are zero but after trying many, many variations of this and other crc16 implementatons, I cannot reproduce their given checksum. A table-driven crc16_CCITT is included in the implementaton. In any case, a warning is printed that states this fact when reading each .chn file.
+The published documentation on the .chn file format claims that it uses a CRC32 checksum on the header data only. After discussing with DTS, they state that they actually use a crc16_CCITT where the other 2 bytes are zero but after trying many, many variations of this and other crc16 implementatons, I cannot reproduce their given checksum. A table-driven crc16_CCITT is included in the implementaton. In any case, a warning is printed that states that a checksum is not computed when reading each .chn file.
 
 ##Installing
 
@@ -56,3 +56,8 @@ You can simply put this file somewhere in your MATLAB folder path. Since many us
 ##Bugs and/or Enhancements
 
 As stated, the DTS file/folder structure is not well documented. Any bugs that you come across, enhancements, or other insighes are greatly appreciated and will be incorporated.
+
+##License
+
+The contents of this repository are distributed under the BSD 3-clause license.
+
